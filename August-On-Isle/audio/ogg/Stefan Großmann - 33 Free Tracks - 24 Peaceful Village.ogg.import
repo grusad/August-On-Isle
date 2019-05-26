@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Stefan Großmann - 33 Free Tracks - 24 Peaceful Village.ogg-cffee20afd037c6ad912d28002d8a49e.oggstr"
+
+[deps]
+
+source_file="res://audio/ogg/Stefan Großmann - 33 Free Tracks - 24 Peaceful Village.ogg"
+dest_files=[ "res://.import/Stefan Großmann - 33 Free Tracks - 24 Peaceful Village.ogg-cffee20afd037c6ad912d28002d8a49e.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

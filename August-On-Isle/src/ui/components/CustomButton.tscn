@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://themes/ui_theme.theme" type="Theme" id=1]
+[ext_resource path="res://src/ui/components/CustomButton.gd" type="Script" id=2]
+
+[node name="CustomButton" type="Button"]
+margin_right = 278.0
+margin_bottom = 22.0
+theme = ExtResource( 1 )
+text = "TEXT GOES HERE"
+align = 0
+script = ExtResource( 2 )
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

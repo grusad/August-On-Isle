@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://models/buildings/Shelter_01_Leaves.dae" type="PackedScene" id=1]
+[ext_resource path="res://src/entities/static_entities/buildings/Building.gd" type="Script" id=2]
+
+
+[sub_resource type="BoxShape" id=1]
+
+[node name="Shelter_00" instance=ExtResource( 1 )]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource( 2 )
+
+[node name="Shelter_01_Leaves_mesh" parent="." index="0"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-008, -1, 0, 1, -4.37114e-008, 0, 1.31175, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="." index="2"]
+transform = Transform( 1.2, 0, 0, 0, 1.11472, -0.0669131, 0, 1.0037, 0.0743145, -0.117951, 1.31175, 0 )
+shape = SubResource( 1 )
