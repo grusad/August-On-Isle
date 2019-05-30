@@ -2,7 +2,7 @@
 
 [ext_resource path="res://src/world/World.gd" type="Script" id=1]
 [ext_resource path="res://src/world/Terrain.tscn" type="PackedScene" id=2]
-[ext_resource path="res://src/world/Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://src/world/player/Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://src/world/WorldEnvironment.gd" type="Script" id=4]
 [ext_resource path="res://addons/Sky/sky_texture.tscn" type="PackedScene" id=5]
 [ext_resource path="res://textures/milkywaypan_brunier_2048.jpg" type="Texture" id=6]
@@ -23,7 +23,7 @@ script = ExtResource( 1 )
 
 [node name="ElementContainer" type="Spatial" parent="."]
 
-[node name="ResourceContainer" type="Spatial" parent="."]
+[node name="ItemsContainer" type="Spatial" parent="."]
 
 [node name="ObjectsContainer" type="Spatial" parent="."]
 

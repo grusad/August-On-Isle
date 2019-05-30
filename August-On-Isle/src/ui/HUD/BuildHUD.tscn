@@ -20,7 +20,7 @@ margin_right = 250.0
 margin_bottom = 150.0
 tab_align = 0
 
-[node name="Build" type="MarginContainer" parent="TabContainer"]
+[node name="Builds" type="MarginContainer" parent="TabContainer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_top = 22.0
@@ -29,13 +29,13 @@ custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
 
-[node name="Buttons" type="VBoxContainer" parent="TabContainer/Build"]
+[node name="Buttons" type="VBoxContainer" parent="TabContainer/Builds"]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 480.0
 margin_bottom = 258.0
 
-[node name="Craft" type="MarginContainer" parent="TabContainer"]
+[node name="Items" type="MarginContainer" parent="TabContainer"]
 visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -45,7 +45,7 @@ custom_constants/margin_top = 20
 custom_constants/margin_left = 20
 custom_constants/margin_bottom = 20
 
-[node name="Buttons" type="VBoxContainer" parent="TabContainer/Craft"]
+[node name="Buttons" type="VBoxContainer" parent="TabContainer/Items"]
 margin_left = 20.0
 margin_top = 20.0
 margin_right = 480.0

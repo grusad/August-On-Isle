@@ -4,6 +4,7 @@ class_name Entity
 var outline_mesh_instance = null
 var outline_material = preload("res://materials/outline_material.material")
 
+
 func _ready():
 	add_to_group("save")
 	
@@ -45,3 +46,9 @@ func load_json(data_dict):
 	translation = Utils.dict_to_vec3(data_dict["translation"])
 	rotation_degrees = Utils.dict_to_vec3(data_dict["rotation"])
 	scale = Utils.dict_to_vec3(data_dict["scale"])
+	
+func get_hold_hints():
+	
+	return ["[RMB] Place", "[SCROLL] Rotate"]
+	
+	

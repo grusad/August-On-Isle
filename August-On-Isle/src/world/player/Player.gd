@@ -1,9 +1,13 @@
 extends KinematicBody
 
 signal place_object
+signal drop_item
+signal entity_entered_raycast
+signal entity_exited_raycast
+
 
 const GRAVITY = -49
-const MAX_SPEED = 10
+const MAX_SPEED = 8
 const JUMP_SPEED = 18
 const ACCEL = 4.5
 const DEACCEL = 16
@@ -21,34 +25,48 @@ var holding_object_angle = 0
 var relative_normal = Vector3(0, 0, 0)
 var current_target = null
 var fly_mode = false
-var wielding_item = null
+var has_emitted_raycast_signal = false
 
 onready var camera = $RotationPivot/Camera
 onready var rotation_helper = $RotationPivot
 onready var feet_ray = $FeetRay
 onready var use_ray = $RotationPivot/Camera/UseRay
 onready var ray_tip = $RotationPivot/Camera/RayTip
-onready var anim_player = $AnimationPlayer
+onready var move_anim_player = $MoveAnimation
+onready var mine_anim_player = $MineAnimation
 onready var place_ray = $RotationPivot/Camera/PlaceRay
 onready var build_hud = $CanvasLayer/HUD/BuildHUD
 onready var blur = $CanvasLayer/HUD/Blur
 onready var hand = $RotationPivot/Camera/Hand
+onready var item_handler = $ItemHandler
+onready var mine_audio = $MineAudio
+onready var open_audio = $CanvasLayer/HUD/Open
+onready var close_audio = $CanvasLayer/HUD/Close
+onready var hint = $CanvasLayer/HUD/Crosshair/Hint
 
 var ground_normal = null
 
 func _ready():
+	randomize()
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	build_hud.connect("spawn_build", self, "on_spawn_build")
 	blur.blur_out()
 	
+	connect("entity_entered_raycast", self, "entity_entered_raycast")
+	connect("entity_exited_raycast", self, "entity_exited_raycast")
+	
+	
 	
 func _physics_process(delta):
 	process_input(delta)
-	input_mouse_poll()
-	process_movement(delta)
-	process_use_ray()
-	process_place_ray()
-	process_holding_object()
+	
+	if not is_player_freezed():
+		input_mouse_poll()
+		process_movement(delta)
+		process_use_ray()
+		process_place_ray()
+		process_holding_object()
+		process_wield_item()
 
 func process_input(delta):
 	#Walking
@@ -93,6 +111,9 @@ func process_input(delta):
 	#Capturing/Freeing the cursor
 	if Input.is_action_just_pressed("ui_cancel"):
 		toggle_mouse_mode()
+		
+	if Input.is_action_just_pressed("drop_item"):
+		drop_item()
 			
 
 # Sets the raycasts lenght position (RayTip) to, if collinding the collision points. or if not collinding default position. (0, 0, -4.5) 
@@ -123,25 +144,40 @@ func look_at_with_y(new_y,v_up):
 func process_use_ray():
 	
 	if is_holding_object():
+		if current_target != null:
+			emit_signal("entity_exited_raycast", current_target)
 		return
-	
+#
 	if use_ray.is_colliding():
-		var collider = use_ray.get_collider()
-		if collider.is_in_group("building") or collider.is_in_group("items"):
-			current_target = collider
-			current_target.set_targeting(true)
-		else:
-			if is_interacting_with_target():
-				current_target.set_targeting(false)
-				current_target = null
-			
-	elif is_interacting_with_target() and not use_ray.is_colliding():
-		current_target.set_targeting(false)
-		current_target = null
 		
+		if current_target != null:
+			if current_target.get_instance_id() != use_ray.get_collider().get_instance_id():
+				emit_signal("entity_exited_raycast", current_target)
+		if has_emitted_raycast_signal:
+			return
+		if use_ray.get_collider().is_in_group("interactable"):
+			emit_signal("entity_entered_raycast", use_ray.get_collider())
+			has_emitted_raycast_signal = true
+	else:
+		if current_target != null:
+			emit_signal("entity_exited_raycast", current_target)
 
+func entity_entered_raycast(entity):
+	entity.set_targeting(true)
+	current_target = entity
+	if entity.has_method("get_hints"):
+		hint.show_hints(entity.get_hints())
+	
+	
+func entity_exited_raycast(entity):
+	entity.set_targeting(false)
+	current_target = null
+	has_emitted_raycast_signal = false
+	hint.hide_hints()
+	
 
-func input_mouse_poll():
+func input_mouse_poll(): 
+	
 	if Input.is_action_just_pressed("left_mouse"):
 		if is_holding_object():
 			place_holding_object()
@@ -161,11 +197,44 @@ func input_mouse_poll():
 			
 
 func wield_item(item):
-	if wielding_item == null:
-		wielding_item = item
-		wielding_item.rotation_degrees = Vector3(65, -65, 0)
-		hand.add_child(wielding_item)
+	if not item.is_in_group("items"):
+		return
 	
+	if is_wielding_item():
+		drop_item()
+	
+	hand.add_child(item)
+	item.rotation_degrees = Vector3(65, -65, 0)
+	
+func drop_item():
+	if hand.get_child_count() == 0:
+		return
+	
+	var item = hand.get_child(0)
+	item.global_transform.origin = feet_ray.get_collision_point()
+	item.global_transform.basis = look_at_with_y(feet_ray.get_collision_normal(), Vector3.UP)
+	var items_transform = Transform(item.global_transform)
+	hand.remove_child(item)
+	
+	emit_signal("drop_item", item, items_transform)	
+		
+		
+func process_wield_item():
+	if not is_wielding_item() or is_holding_object():
+		return
+		
+	if Input.is_action_pressed("left_mouse"):
+		set_animation("mine", mine_anim_player)
+	else:
+		set_animation("idle", mine_anim_player)
+		
+
+func mine():
+	if use_ray.is_colliding() and use_ray.get_collider().is_in_group("element"):
+		var collider = use_ray.get_collider()
+		item_handler.handle_item(hand.get_child(0), collider)
+		mine_audio.play()
+
 func process_holding_object():
 	
 	if is_holding_object():
@@ -185,8 +254,10 @@ func toggle_build_hud():
 	toggle_mouse_mode()
 	if build_hud.visible:
 		blur.blur_in()
+		open_audio.play()
 	else:
 		blur.blur_out()
+		close_audio.play()
 	
 		
 
@@ -198,9 +269,9 @@ func toggle_mouse_mode():
 
 func toggle_crouch_state():
 	if !is_crouching:
-		anim_player.play("crouch_down")
+		move_anim_player.play("crouch_down")
 	else:
-		anim_player.play("crouch_up")
+		move_anim_player.play("crouch_up")
 	is_crouching = !is_crouching
 
 # Gives the palyer an objec to hold
@@ -209,8 +280,7 @@ func hold_object(object):
 		holding_object.queue_free()
 	# if interacting with a target with useray, reset it.
 	if is_interacting_with_target():
-		current_target.set_targeting(false)
-		current_target = null
+		emit_signal("entity_exited_raycast", current_target)
 	
 	holding_object = object
 	use_ray.add_exception(holding_object)
@@ -218,8 +288,8 @@ func hold_object(object):
 	var collision_shape = holding_object.get_node("CollisionShape")
 	if collision_shape != null:
 		collision_shape.disabled = true
-	if holding_object is RigidBody:
-		holding_object.sleeping = true
+	if holding_object.has_method("get_hold_hints"):
+		hint.show_hints(holding_object.get_hold_hints())
 
 # add to this function whenever a new state should make the player freeze...
 func is_player_freezed():
@@ -228,15 +298,14 @@ func is_player_freezed():
 # Emits a signal that the world connects to, passes the holding object and its transform
 func place_holding_object():
 	if is_holding_object():
-		if holding_object is RigidBody:
-			holding_object.sleeping = false
 		var object_transform = Transform(holding_object.global_transform)
 		ray_tip.remove_child(holding_object)
 		emit_signal("place_object", holding_object, object_transform)
 		var collision_shape = holding_object.get_node("CollisionShape")
 		if collision_shape != null:
 			collision_shape.disabled = false
-	
+		if holding_object.has_method("get_hold_hints"):
+			hint.hide_hints()
 		holding_object = null
 		use_ray.clear_exceptions()
 		
@@ -244,6 +313,8 @@ func place_holding_object():
 #Removes the object that the user holds infront of him.
 func discard_holding_object():
 	if is_holding_object():
+		if holding_object.has_method("get_hold_hints"):
+			hint.hide_hints()
 		holding_object.queue_free()
 		holding_object = null
 
@@ -258,11 +329,11 @@ func is_holding_object():
 
 func is_interacting_with_target():
 	return current_target != null
+	
+func is_wielding_item():
+	return hand.get_child_count() > 0
 
 func process_movement(delta):
-	
-	if is_player_freezed():
-		return
 	
 	if translation.y < -0.5:
 		is_swimming = true
@@ -327,7 +398,6 @@ func save_json():
 		"rotation" : Utils.vec3_to_dict(rotation_degrees),
 		"scale" : Utils.vec3_to_dict(scale),
 		"rotation_helper_rotation" : Utils.vec3_to_dict(rotation_helper.rotation_degrees),
-	
 	}
 	return save_data
 	
@@ -337,5 +407,12 @@ func load_json(data_dict):
 	rotation_degrees = Utils.dict_to_vec3(data_dict["rotation"])
 	scale = Utils.dict_to_vec3(data_dict["scale"])
 	rotation_helper.rotation_degrees = Utils.dict_to_vec3(data_dict["rotation_helper_rotation"])
+	
 
+func set_animation(name, anim_player):
+	if anim_player.current_animation == name:
+		return
+	
+	anim_player.play(name)
+	
 	

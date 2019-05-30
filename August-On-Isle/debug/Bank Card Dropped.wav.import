@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Bank Card Dropped.wav-0c7532df0f9477fc801d873a251098b3.sample"
+
+[deps]
+
+source_file="res://debug/Bank Card Dropped.wav"
+dest_files=[ "res://.import/Bank Card Dropped.wav-0c7532df0f9477fc801d873a251098b3.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

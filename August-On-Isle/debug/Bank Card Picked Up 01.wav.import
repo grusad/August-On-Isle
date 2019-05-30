@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Bank Card Picked Up 01.wav-173ce813078d2c367e61604470a06ae6.sample"
+
+[deps]
+
+source_file="res://debug/Bank Card Picked Up 01.wav"
+dest_files=[ "res://.import/Bank Card Picked Up 01.wav-173ce813078d2c367e61604470a06ae6.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

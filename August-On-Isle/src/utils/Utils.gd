@@ -22,4 +22,18 @@ func dict_to_vec3(dict):
 	vec3.z = dict["z"]
 	return vec3
 
-
+func read_filenames(path, ends_with):
+	var dir = Directory.new()
+	var names = []
+	dir.open(path)
+	dir.list_dir_begin()
+	var file_name = dir.get_next()
+	while (file_name != ""):
+		
+		if not dir.current_is_dir() and file_name.ends_with(ends_with):
+			var dot_index = file_name.find(".")
+			names.push_back(file_name.substr(0, dot_index))
+			
+		file_name = dir.get_next()
+		
+	return names

@@ -6,7 +6,7 @@ var world_instance = null
 
 
 func _ready():
-	set_process(false)
+	pass
 	
 func new_game():
 	hide_menu()
@@ -26,7 +26,10 @@ func hide_menu():
 	menu.visible = false
 		
 		
-		
-		
-		
+func _process(delta):
+	if Input.is_action_just_released("quick_save"):
+		GameSaver.save_json(1)
+	if Input.is_action_just_pressed("quick_load"):
+		print("here")
+		GameSaver.load_json(1)
 		

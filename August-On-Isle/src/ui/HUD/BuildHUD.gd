@@ -2,8 +2,8 @@ extends Control
 
 signal spawn_build
 
-onready var build_buttons = $TabContainer/Build/Buttons
-onready var craft_buttons = $TabContainer/Craft/Buttons
+onready var build_buttons = $TabContainer/Builds/Buttons
+onready var craft_buttons = $TabContainer/Items/Buttons
 onready var button_scene = load("res://src/ui/components/CustomButton.tscn")
 
 

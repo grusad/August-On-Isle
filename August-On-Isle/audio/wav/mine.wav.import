@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/mine.wav-7a9d068b589a31533b7fdcf8251b7d18.sample"
+
+[deps]
+
+source_file="res://audio/wav/mine.wav"
+dest_files=[ "res://.import/mine.wav-7a9d068b589a31533b7fdcf8251b7d18.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

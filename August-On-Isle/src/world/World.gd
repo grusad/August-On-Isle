@@ -5,9 +5,11 @@ onready var object_container = $ObjectsContainer
 onready var player = $Player
 onready var fader = $Fader
 onready var music_plaer = $MusicPlayer
+onready var item_container = $ItemsContainer
 
 func _ready():
 	player.connect("place_object", self, "on_player_placed_object")
+	player.connect("drop_item", self, "on_player_drop_item")
 	
 	
 func new_world(world_id):
@@ -26,3 +28,8 @@ func load_world(world_id):
 func on_player_placed_object(object, object_transform):
 	object.global_transform = object_transform
 	object_container.add_child(object)
+
+	
+func on_player_drop_item(item, item_transform):
+	item.global_transform = item_transform
+	item_container.add_child(item)
